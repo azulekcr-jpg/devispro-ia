@@ -35,7 +35,7 @@ docs/MISE-EN-LIGNE.md          liste de contrôle avant ouverture au public
 ```
 
 ## Déploiement
-Voir `docs/MISE-EN-LIGNE.md`. En bref : dépôt GitHub, Vercel (ou un hébergeur Docker avec le `Dockerfile`), variables d'environnement de `.env.example`, URL de production ajoutée dans Supabase.
+Voir `docs/MISE-EN-LIGNE.md`. **E-mails de connexion : `docs/EMAILS.md`** (un SMTP doit être configuré dans Supabase, sinon « Envoi impossible » pour les adresses hors équipe). En bref : dépôt GitHub, Vercel (ou un hébergeur Docker avec le `Dockerfile`), variables d'environnement de `.env.example`, URL de production ajoutée dans Supabase.
 
 ## Sécurité
 - Aucune clé secrète dans le code. Seules l'URL et la clé publique Supabase sont utilisées dans le navigateur.
