@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DevisPro AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700&family=Public+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#17202b;--mut:#5b6673;--bg:#eceeec;--card:#fff;--line:#d3d9df;--blue:#1f3f6b;--yel:#f2b705;--dng:#c0392b;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink:#e8ecf0;--mut:#9aa6b3;--bg:#10161d;--card:#18212b;--line:#2c3947;--blue:#8fb2e0;--dng:#ff8a7a}}
+:root[data-theme="dark"]{--ink:#e8ecf0;--mut:#9aa6b3;--bg:#10161d;--card:#18212b;--line:#2c3947;--blue:#8fb2e0;--dng:#ff8a7a}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.5 "Public Sans",system-ui,sans-serif}
+[hidden]{display:none!important}
+.bar{background:#1f3f6b;border-bottom:4px solid var(--yel);color:#fff;padding:12px 16px;display:flex;align-items:center;gap:16px;font:700 20px "Bricolage Grotesque",system-ui,sans-serif}
+nav{position:fixed;left:0;right:0;bottom:0;z-index:5;display:flex;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);font-family:"Public Sans",system-ui,sans-serif}
+nav button{flex:1;min-height:58px;padding:4px;border:0;border-top:3px solid transparent;background:none;color:var(--mut);font:600 12px/1.2 "Public Sans",system-ui,sans-serif;cursor:pointer}
+nav button.on{color:var(--blue);border-top-color:var(--yel)}
+nav button[data-go=new]{color:var(--ink);background:var(--yel)}
+main{max-width:940px;margin:0 auto;padding:22px 16px 100px}
+h1{font:700 clamp(26px,6vw,40px)/1.1 "Bricolage Grotesque",system-ui,sans-serif;letter-spacing:-.02em;margin:6px 0 12px;text-wrap:balance}
+.lead,.sm{color:var(--mut)}.sm{font-size:14px}.lead{max-width:60ch;margin:0 0 20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;margin-bottom:16px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:16px}
+.chip{font:600 14px "Public Sans",sans-serif;padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
+.g{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:14px}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.f{display:block;margin-bottom:14px}.g .f{margin:0}
+.f>span{display:block;font-weight:600;font-size:14px;margin-bottom:4px}
+input,textarea,select{width:100%;font:400 16px/1.4 "Public Sans",system-ui,sans-serif;padding:11px 12px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:inherit}
+textarea{resize:vertical;min-height:120px}
+:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+.btn{font:600 16px "Public Sans",sans-serif;min-height:48px;padding:10px 18px;border-radius:8px;border:2px solid var(--blue);background:transparent;color:var(--blue);cursor:pointer}
+.btn.pri{background:var(--yel);border-color:var(--yel);color:#1b1500}
+.btn.s{min-height:40px;padding:6px 14px;font-size:14px}.btn.dng{border-color:var(--dng);color:var(--dng)}
+.err{color:var(--dng);margin:8px 0 0;min-height:1.5em;font-weight:600}
+.bt{display:flex;flex-wrap:wrap;gap:10px}
+.top{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:12px}
+.row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px 16px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px}
+.rm{display:flex;flex-direction:column;min-width:0;overflow-wrap:anywhere}.rm small{color:var(--mut)}
+.rt{font:700 20px "Bricolage Grotesque",system-ui,sans-serif;text-align:right}.rt small{display:block;font:400 12px "Public Sans",sans-serif;color:var(--mut)}
+.ra{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(76px + env(safe-area-inset-bottom,0px));z-index:9;background:#17202b;color:#fff;padding:10px 16px;border-radius:8px;max-width:92vw;font-size:14px}
+.tb{display:flex;flex-wrap:wrap;gap:10px;margin:26px 0 14px}
+.paper{--ink:#17202b;--mut:#5b6673;--line:#d3d9df;--blue:#1f3f6b;background:#fff;color:var(--ink);border-top:6px solid var(--yel);border-radius:4px;padding:22px;box-shadow:0 2px 14px rgba(0,0,0,.12)}
+.paper input,.paper textarea,.paper select{background:transparent;border:0;border-bottom:1px dashed var(--line);border-radius:0;padding:5px 2px;font-size:15px}
+.paper .big{font:700 19px "Bricolage Grotesque",system-ui,sans-serif}
+.ph{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:20px}
+.co{flex:1 1 260px}.dn{flex:0 1 220px;text-align:right}
+.dn h2{font:700 28px "Bricolage Grotesque",system-ui,sans-serif;margin:0 0 6px}
+.dn label{display:block;font-size:13px;color:var(--mut)}.dn input{text-align:right}
+.cl{margin-bottom:20px;max-width:420px}
+.lh,.ln{display:grid;grid-template-columns:minmax(0,1fr) 60px 56px 88px 76px 92px 30px;gap:8px;align-items:center}
+.lh{font-size:13px;font-weight:600;color:#fff;background:var(--blue);padding:7px 8px;border-radius:3px}
+.ln{padding:8px;border-bottom:1px solid var(--line)}
+.ln textarea{min-height:0;field-sizing:content;resize:none}
+.ln input{text-align:right}.ln output{text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
+.l{display:none;font-size:12px;color:var(--mut)}
+.del{border:0;background:transparent;color:#c0392b;font-size:22px;cursor:pointer;line-height:1}
+#add{margin:14px 0}
+.tot{margin-left:auto;max-width:300px;font-variant-numeric:tabular-nums}
+.tot div{display:flex;justify-content:space-between;padding:3px 0}
+.tot .ttc{border-top:2px solid var(--ink);margin-top:6px;padding-top:8px;font:700 20px "Bricolage Grotesque",system-ui,sans-serif}
+.paper>textarea{margin-top:18px;font-size:13px;color:var(--mut);min-height:64px;border:1px dashed var(--line)}
+.sig{margin:18px 0 0 auto;width:min(100%,320px);height:96px;border:1px solid var(--line);padding:8px;font-size:13px;color:var(--mut)}
+@media (min-width:641px){
+nav{position:static;margin-left:auto;border:0;background:none;padding:0;width:auto}
+nav button{flex:none;padding:6px 14px;min-height:40px;color:#dbe4f0}nav button.on{color:#fff}nav button[data-go=new]{border-radius:6px;color:#1b1500}
+main{padding-bottom:48px}#toast{bottom:24px}
+.row{grid-template-columns:minmax(0,1fr) auto auto}.ra{grid-column:auto}
+}
+@media (max-width:640px){
+.g,.g3{grid-template-columns:1fr}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.lh{display:none}.paper{padding:16px}
+.ln{grid-template-columns:repeat(3,minmax(0,1fr))}.ln .d{grid-column:1/-1}.l{display:block}.ln output{text-align:left;display:block}
+.bt .btn{flex:1 1 100%}.tb .btn{flex:1 1 calc(50% - 10px)}.ra .btn{flex:1}
+}
+@media print{
+body{background:#fff}.bar,nav,.noprint,#top,.err,#toast{display:none!important}
+main{padding:0}.paper{box-shadow:none;border-radius:0;padding:0}
+.paper input,.paper textarea,.paper select{border:0!important;appearance:none;-webkit-appearance:none;padding:2px 0}
+.paper ::placeholder{color:transparent}.paper>textarea{border:0}.lh{-webkit-print-color-adjust:exact;print-color-adjust:exact}.del,#add{display:none}
+}
+</style>
+</head>
+<body>
+<div class="bar noprint"><span>DevisPro AI</span>
+<nav class="noprint" aria-label="Navigation">
+<button data-go="devis">Mes devis</button><button data-go="new">Nouveau devis</button><button data-go="clients">Mes clients</button><button data-go="ent">Mon entreprise</button>
+</nav></div>
+<main>
+<p class="sm err" id="warn" hidden>Le stockage du navigateur est indisponible : vos données seront perdues à la fermeture de la page.</p>
+
+<section id="v-devis">
+<div class="top"><h1>Mes devis</h1><button class="btn pri noprint" data-go="new">Nouveau devis</button></div>
+<input id="qs" type="search" placeholder="Rechercher par client ou numéro" aria-label="Rechercher un devis" style="margin-bottom:14px">
+<div id="ql"></div>
+</section>
+
+<section id="v-edit" hidden>
+<div id="top">
+<h1>Décrivez le chantier, le devis est prêt.</h1>
+<p class="lead">Notez vos prestations comme vous les diriez au client. DevisPro AI les transforme en devis chiffré, modifiable, à télécharger en PDF. Gratuit, sans compte : vos données restent dans votre navigateur.</p>
+<div class="card">
+<div class="chips"><span class="sm">Charger un exemple :</span>
+<button class="chip" type="button" data-ex="plomb">Plombier</button>
+<button class="chip" type="button" data-ex="elec">Électricien</button>
+<button class="chip" type="button" data-ex="pein">Peintre</button></div>
+<div class="g">
+<label class="f"><span>Nom de l'entreprise</span><input id="co" autocomplete="organization"></label>
+<label class="f"><span>SIRET (facultatif)</span><input id="si" inputmode="numeric"></label>
+</div>
+<label class="f"><span>Nom du client</span><input id="cl" list="cls" autocomplete="off"><datalist id="cls"></datalist></label>
+<div class="g"><label class="f"><span>Téléphone du client</span><input id="clt" inputmode="tel"></label><label class="f"><span>E-mail du client</span><input id="clm" inputmode="email"></label></div>
+<label class="f"><span>Adresse du client</span><input id="cla"></label>
+<label class="f"><span>Description des travaux</span><textarea id="txt" rows="6"></textarea>
+<small class="sm">Une prestation par ligne. Indiquez quantité et prix unitaire HT quand vous les avez, par exemple « 2 prises à 35 € » ou « 3 h main d'œuvre à 55 € ». Sinon, les valeurs par défaut ci-dessous s'appliquent.</small></label>
+<div class="g g3">
+<label class="f"><span>Quantité par défaut</span><input id="qty" inputmode="decimal" value="1"></label>
+<label class="f"><span>Prix unitaire HT (€)</span><input id="pu" inputmode="decimal" value="0"></label>
+<label class="f"><span>TVA</span><select id="tva"><option value="20">20 %</option><option value="10" selected>10 %</option><option value="5.5">5,5 %</option><option value="2.1">2,1 %</option><option value="0">0 %</option></select></label>
+</div>
+<div class="bt"><button class="btn pri" id="gen" type="button">Générer le devis</button><button class="btn" id="blank" type="button">Saisir les lignes à la main</button></div>
+<p class="err" id="err" role="alert"></p>
+</div>
+</div>
+<div id="out" hidden>
+<div class="tb noprint">
+<button class="btn" id="back" type="button">Mes devis</button>
+<button class="btn pri" id="pdf" type="button">Télécharger le PDF</button>
+<button class="btn" id="prt" type="button">Imprimer</button>
+<button class="btn dng" data-act="del" type="button">Supprimer</button>
+</div>
+<div class="paper" id="paper">
+<div class="ph">
+<div class="co"><input class="big" data-f="co" aria-label="Entreprise" placeholder="Votre entreprise"><input data-f="adr" aria-label="Adresse" placeholder="Adresse"><input data-f="tel" inputmode="tel" aria-label="Téléphone" placeholder="Téléphone"><input data-f="mail" inputmode="email" aria-label="E-mail" placeholder="E-mail"><input data-f="si" aria-label="SIRET" placeholder="SIRET"></div>
+<div class="dn"><h2>Devis</h2><label>N° <input data-f="num"></label><label>Date <input data-f="date"></label><label>Validité, en jours <input data-f="valid" inputmode="numeric"></label></div>
+</div>
+<div class="cl"><span class="sm">Client</span><input class="big" data-c="n" aria-label="Client" placeholder="Nom du client"><input data-c="adr" aria-label="Adresse du client" placeholder="Adresse"><input data-c="tel" inputmode="tel" aria-label="Téléphone du client" placeholder="Téléphone"><input data-c="mail" inputmode="email" aria-label="E-mail du client" placeholder="E-mail"></div>
+<div class="lh"><span>Désignation</span><span>Qté</span><span>Unité</span><span>P.U. HT</span><span>TVA</span><span>Total HT</span><span></span></div>
+<div id="lines"></div>
+<button class="btn noprint" id="add" type="button">Ajouter une ligne</button>
+<div class="tot" id="tot"></div>
+<p class="sm" id="vat0" hidden>TVA non applicable, art. 293 B du CGI.</p>
+<textarea data-f="note" aria-label="Conditions"></textarea>
+<div class="sig">Bon pour accord, date et signature du client</div>
+</div>
+</div>
+</section>
+
+<section id="v-clients" hidden>
+<h1>Mes clients</h1>
+<div class="card">
+<div class="g"><label class="f"><span>Nom</span><input id="cn" autocomplete="off"></label><label class="f"><span>Téléphone</span><input id="ct" inputmode="tel"></label>
+<label class="f"><span>E-mail</span><input id="cm" inputmode="email"></label><label class="f"><span>Adresse</span><input id="ca"></label></div>
+<button class="btn pri" id="csave" type="button">Ajouter le client</button> <button class="btn" id="ccancel" type="button" hidden>Annuler</button>
+</div>
+<div id="cll"></div>
+</section>
+
+<section id="v-ent" hidden>
+<h1>Mon entreprise</h1>
+<p class="lead">Ces informations s'ajoutent automatiquement à chaque nouveau devis. Appuyez sur Enregistrer pour les conserver.</p>
+<div class="card">
+<label class="f"><span>Nom de l'entreprise</span><input data-p="n" autocomplete="organization"></label>
+<label class="f"><span>Adresse</span><input data-p="a" autocomplete="street-address"></label>
+<div class="g"><label class="f"><span>Téléphone</span><input data-p="t" inputmode="tel" autocomplete="tel"></label><label class="f"><span>E-mail</span><input data-p="m" inputmode="email" autocomplete="email"></label></div>
+<label class="f"><span>Numéro SIRET</span><input data-p="s" inputmode="numeric"></label>
+<button class="btn pri" id="psave" type="button">Enregistrer</button>
+<p class="sm" id="pmsg" role="status" aria-live="polite" style="margin:10px 0 0;min-height:1.5em"></p>
+</div>
+</section>
+</main>
+<div id="toast" role="status" hidden></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+const $=s=>document.querySelector(s),eur=n=>new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR'}).format(n||0),
+num=v=>parseFloat(String(v).replace(',','.').replace(/\s/g,''))||0,r2=n=>Math.round(n*100)/100,
+esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])),
+fr=n=>String(n).replace('.',','),uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+const EX={
+plomb:{co:"Plomberie Martin & Fils",si:"812 345 678 00019",cl:"Mme Sophie Lambert",qty:1,pu:80,tva:10,txt:"Remplacement du chauffe-eau 200 L à 480 €\n3 h main d'œuvre à 55 €\n2 raccords flexibles à 18 €\nÉvacuation de l'ancien ballon à 40 €"},
+elec:{co:"Électricité Durand",si:"534 218 907 00027",cl:"M. Karim Benali",qty:1,pu:60,tva:10,txt:"Remplacement du tableau électrique 2 rangées à 650 €\n6 prises 16 A à 38 €\n4 h main d'œuvre à 60 €\nContrôle et mise en conformité à 120 €"},
+pein:{co:"Peinture Leroy",si:"449 876 123 00015",cl:"Mme Claire Fontaine",qty:1,pu:20,tva:10,txt:"Peinture salon et couloir 45 m² à 22 €\nPréparation et rebouchage des murs 1 forfait à 180 €\nProtection du sol et du mobilier 1 forfait à 60 €"}};
+const UN={heure:'h',heures:'h',m2:'m²',jour:'j',jours:'j','unité':'u','unités':'u',forfaits:'forfait'},
+UNIT=/(\d+(?:[.,]\d+)?)\s*(h|heures?|m²|m2|ml|jours?|j|u|unités?|forfaits?)(?=[\s,;.]|$)/i;
+let S={prof:{},clients:[],quotes:[]},q=null,isNew=false,ce=null,T=null,tt;
+try{const s=JSON.parse(localStorage.getItem('dpa2'));
+ if(s)S={...S,...s};
+ else{const x=(JSON.parse(localStorage.getItem('dpa'))||{}).q;
+  if(x&&x.lines)S.quotes.push({id:uid(),co:x.company,si:x.siret,client:{n:x.client||''},num:x.num,date:x.date,valid:x.valid,lines:x.lines,note:x.note,ts:Date.now()});}}catch(e){}
+
+function save(){try{localStorage.setItem('dpa2',JSON.stringify(S));}catch(e){$('#warn').hidden=false;}}
+function toast(t){const e=$('#toast');e.textContent=t;e.hidden=false;clearTimeout(tt);tt=setTimeout(()=>e.hidden=true,4000);}
+function arm(b,fn){if(b.dataset.a){fn();return;}b.dataset.a=1;const t=b.textContent;b.textContent='Confirmer ?';setTimeout(()=>{delete b.dataset.a;b.textContent=t;},3000);}
+function tot(x){let ht=0,by={};x.lines.forEach(l=>{const h=r2(l.q*l.p);ht+=h;by[l.t]=r2((by[l.t]||0)+h*l.t/100);});
+ const tv=r2(Object.values(by).reduce((a,b)=>a+b,0));return{ht:r2(ht),by,tv,ttc:r2(ht+tv)};}
+
+function go(v){
+ ['devis','edit','clients','ent'].forEach(x=>$('#v-'+x).hidden=x!==v);
+ const a=v==='edit'?(isNew?'new':'devis'):v;
+ document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.go===a));
+ if(v==='devis')listQ();if(v==='clients')listC();
+ if(v==='ent'){document.querySelectorAll('[data-p]').forEach(e=>e.value=S.prof[e.dataset.p]||'');$('#pmsg').textContent='';}
+ scrollTo(0,0);
+}
+function openNew(c){
+ q=null;isNew=true;$('#txt').value='';$('#cl').value=c?c.n:'';$('#clt').value=c&&c.t||'';$('#clm').value=c&&c.m||'';$('#cla').value=c&&c.a||'';$('#err').textContent='';
+ $('#co').value=S.prof.n||'';$('#si').value=S.prof.s||'';
+ $('#cls').innerHTML=S.clients.map(c=>`<option value="${esc(c.n)}">`).join('');
+ $('#top').hidden=false;$('#out').hidden=true;go('edit');
+}
+function openQ(id){q=S.quotes.find(x=>x.id===id);if(!q)return;q.client=q.client||{};isNew=false;$('#top').hidden=true;show();go('edit');}
+function delQ(id){S.quotes=S.quotes.filter(x=>x.id!==id);if(q&&q.id===id)q=null;save();listQ();toast('Devis supprimé.');}
+
+function listQ(){
+ const s=($('#qs').value||'').toLowerCase(),
+ a=S.quotes.filter(x=>(x.num+' '+((x.client||{}).n||'')).toLowerCase().includes(s)).sort((a,b)=>b.ts-a.ts);
+ $('#ql').innerHTML=a.map(x=>`<div class="row"><div class="rm"><b>${esc((x.client||{}).n||'Sans client')}</b><small>${esc(x.num)}, ${esc(x.date)}</small></div>
+<div class="rt">${eur(tot(x).ttc)}<small>TTC</small></div>
+<div class="ra"><button class="btn s" data-act="open" data-id="${x.id}">Ouvrir</button><button class="btn s" data-act="pdf" data-id="${x.id}">PDF</button><button class="btn s dng" data-act="delq" data-id="${x.id}">Supprimer</button></div></div>`).join('')
+ ||`<p class="sm">${S.quotes.length?'Aucun résultat.':'Aucun devis pour le moment. Créez le premier en décrivant un chantier.'}</p>`;
+}
+function listC(){
+ $('#cll').innerHTML=S.clients.slice().sort((a,b)=>a.n.localeCompare(b.n,'fr')).map(c=>`<div class="row"><div class="rm"><b>${esc(c.n)}</b><span>${esc([c.t,c.m].filter(Boolean).join(', '))}</span><small>${esc(c.a)}</small></div>
+<div class="ra"><button class="btn s pri" data-act="newfor" data-id="${c.id}">Nouveau devis</button><button class="btn s" data-act="editc" data-id="${c.id}">Modifier</button><button class="btn s dng" data-act="delc" data-id="${c.id}">Supprimer</button></div></div>`).join('')
+ ||'<p class="sm">Aucun client enregistré.</p>';
+}
+function resetC(){ce=null;['cn','ct','cm','ca'].forEach(k=>$('#'+k).value='');$('#csave').textContent='Ajouter le client';$('#ccancel').hidden=true;}
+
+function parse(txt,dq,dp,dt){
+ return txt.split(/\n|;|\.(?=\s|$)/).map(s=>s.replace(/^[\s\-•*]+/,'').trim()).filter(s=>s.length>2).map(s=>{
+  let p=dp,n=dq,u='u',m;
+  const pr=[...s.matchAll(/(\d+(?:[.,]\d+)?)\s*(?:€|euros?)(?:\s*HT)?/gi)];
+  if(pr.length){m=pr[pr.length-1];p=num(m[1]);s=s.replace(m[0],' ');}
+  s=s.replace(/\s+(?:à|pour|de|:|au prix de)\s*$/i,'');
+  if(m=s.match(UNIT)){n=num(m[1]);u=UN[m[2].toLowerCase()]||m[2].toLowerCase();s=s.replace(m[0],' ');}
+  else if(m=s.match(/^(\d+(?:[.,]\d+)?)\s*x?\s+(?=\D)/i)){n=num(m[1]);s=s.slice(m[0].length);}
+  s=s.replace(/\s{2,}/g,' ').trim();
+  return{d:s.charAt(0).toUpperCase()+s.slice(1)||'Prestation',q:n,u,p,t:dt};});
+}
+function rows(){
+ $('#lines').innerHTML=q.lines.map((l,i)=>`<div class="ln"><textarea class="d" rows="1" data-i="${i}" data-k="d" aria-label="Désignation">${esc(l.d)}</textarea>
+<label class="c"><span class="l">Qté</span><input data-i="${i}" data-k="q" inputmode="decimal" value="${fr(l.q)}"></label>
+<label class="c"><span class="l">Unité</span><input data-i="${i}" data-k="u" value="${esc(l.u)}"></label>
+<label class="c"><span class="l">P.U. HT</span><input data-i="${i}" data-k="p" inputmode="decimal" value="${fr(l.p)}"></label>
+<label class="c"><span class="l">TVA</span><select data-i="${i}" data-k="t" aria-label="TVA">${[20,10,5.5,2.1,0].map(v=>`<option value="${v}"${v===l.t?' selected':''}>${fr(v)} %</option>`).join('')}</select></label>
+<span class="c"><span class="l">Total HT</span><output id="lt${i}"></output></span>
+<button class="del noprint" type="button" data-del="${i}" aria-label="Supprimer la ligne">×</button></div>`).join('')||'<p class="sm">Aucune ligne. Ajoutez-en une.</p>';
+}
+function upd(){
+ T=tot(q);
+ q.lines.forEach((l,i)=>{const o=$('#lt'+i);if(o)o.textContent=eur(r2(l.q*l.p));});
+ $('#tot').innerHTML=`<div><span>Total HT</span><b>${eur(T.ht)}</b></div>`+Object.keys(T.by).sort((a,b)=>b-a).map(r=>`<div><span>TVA ${fr(r)} %</span><span>${eur(T.by[r])}</span></div>`).join('')+`<div class="ttc"><span>Total TTC</span><span>${eur(T.ttc)}</span></div>`;
+ $('#vat0').hidden=!(q.lines.length&&q.lines.every(l=>l.t===0));
+}
+function show(){
+ document.querySelectorAll('#paper [data-f]').forEach(e=>e.value=q[e.dataset.f]??'');
+ document.querySelectorAll('#paper [data-c]').forEach(e=>e.value=q.client[e.dataset.c]??'');
+ rows();upd();$('#out').hidden=false;
+}
+
+function mkQ(lines){
+ const nm=$('#cl').value.trim(),c=S.clients.find(x=>x.n.toLowerCase()===nm.toLowerCase())||{},P=S.prof,
+ d=new Date(),y=d.getFullYear(),
+ seq=Math.max(0,...S.quotes.filter(x=>x.num.startsWith('DEV-'+y+'-')).map(x=>+x.num.split('-')[2]||0))+1,
+ n={id:q?q.id:uid(),ts:q?q.ts:Date.now(),co:$('#co').value.trim()||P.n||'Votre entreprise',si:$('#si').value.trim(),adr:P.a||'',tel:P.t||'',mail:P.m||'',
+  client:{n:nm,adr:$('#cla').value.trim()||c.a||'',tel:$('#clt').value.trim()||c.t||'',mail:$('#clm').value.trim()||c.m||''},
+  num:q?q.num:`DEV-${y}-${String(seq).padStart(3,'0')}`,
+  date:d.toLocaleDateString('fr-FR'),valid:'30',lines,
+  note:"Devis gratuit. Règlement : acompte à la commande, solde à la fin des travaux. Les prix s'entendent hors fournitures non listées."};
+ if(q)S.quotes[S.quotes.indexOf(q)]=n;else S.quotes.push(n);
+ q=n;show();save();
+ $('#out').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'});
+}
+$('#gen').onclick=()=>{
+ const txt=$('#txt').value.trim();
+ if(!txt){$('#err').textContent="Décrivez au moins une prestation pour générer le devis.";return;}
+ const lines=parse(txt,num($('#qty').value)||1,num($('#pu').value),num($('#tva').value));
+ if(!lines.length){$('#err').textContent="Aucune prestation reconnue. Écrivez une prestation par ligne.";return;}
+ $('#err').textContent='';mkQ(lines);
+};
+$('#blank').onclick=()=>{
+ $('#err').textContent='';
+ if(q){toast('Le devis est déjà créé : modifiez-le ci-dessous.');$('#out').scrollIntoView();return;}
+ mkQ([{d:'',q:num($('#qty').value)||1,u:'u',p:num($('#pu').value),t:num($('#tva').value)}]);
+ $('#lines .d').focus({preventScroll:true});
+};
+$('#cl').addEventListener('change',()=>{
+ const c=S.clients.find(x=>x.n.toLowerCase()===$('#cl').value.trim().toLowerCase());if(!c)return;
+ if(!$('#clt').value)$('#clt').value=c.t||'';if(!$('#clm').value)$('#clm').value=c.m||'';if(!$('#cla').value)$('#cla').value=c.a||'';
+});
+document.querySelectorAll('[data-ex]').forEach(b=>b.onclick=()=>{
+ const e=EX[b.dataset.ex];
+ if(!S.prof.n)$('#co').value=e.co;if(!S.prof.s)$('#si').value=e.si;
+ $('#cl').value=e.cl;$('#txt').value=e.txt;$('#qty').value=e.qty;$('#pu').value=e.pu;$('#tva').value=e.tva;
+});
+$('#add').onclick=()=>{
+ const last=q.lines[q.lines.length-1];
+ q.lines.push({d:'',q:1,u:'u',p:0,t:last?last.t:10});rows();upd();save();
+ const a=document.querySelectorAll('#lines .d');a[a.length-1].focus();
+};
+$('#back').onclick=()=>go('devis');
+$('#prt').onclick=()=>{try{window.print();}catch(e){toast("L'impression est bloquée ici. Utilisez Télécharger le PDF.");}};
+$('#pdf').onclick=()=>pdf(q);
+$('#csave').onclick=()=>{
+ const n=$('#cn').value.trim();if(!n){toast('Indiquez le nom du client.');return;}
+ const o={id:ce||uid(),n,t:$('#ct').value.trim(),m:$('#cm').value.trim(),a:$('#ca').value.trim()},i=S.clients.findIndex(x=>x.id===ce);
+ if(i>=0)S.clients[i]=o;else S.clients.push(o);
+ resetC();save();listC();toast('Client enregistré.');
+};
+$('#ccancel').onclick=resetC;
+$('#psave').onclick=()=>{
+ const p={};document.querySelectorAll('[data-p]').forEach(e=>{p[e.dataset.p]=e.value.trim();e.value=p[e.dataset.p];});
+ S.prof=p;let ok=false;
+ try{localStorage.setItem('dpa2',JSON.stringify(S));ok=JSON.stringify(JSON.parse(localStorage.getItem('dpa2')).prof)===JSON.stringify(p);}catch(e){}
+ $('#pmsg').textContent=ok?'✓ Informations enregistrées. Elles apparaîtront sur vos nouveaux devis.':"L'enregistrement a échoué : le stockage du navigateur est indisponible.";
+ if(ok)toast('Informations enregistrées.');else $('#warn').hidden=false;
+};
+$('#qs').addEventListener('input',listQ);
+
+document.addEventListener('input',e=>{
+ const t=e.target,d=t.dataset;
+ if(d.p){$('#pmsg').textContent='Modifications non enregistrées.';return;}
+ else if(d.f)q[d.f]=t.value;
+ else if(d.c)q.client[d.c]=t.value;
+ else if(d.i!==undefined){q.lines[d.i][d.k]=(d.k==='d'||d.k==='u')?t.value:num(t.value);upd();}
+ else return;
+ save();
+});
+document.addEventListener('click',e=>{
+ const g=e.target.closest('[data-go]');
+ if(g){g.dataset.go==='new'?openNew():go(g.dataset.go);return;}
+ const r=e.target.closest('[data-del]');
+ if(r){q.lines.splice(+r.dataset.del,1);rows();upd();save();return;}
+ const b=e.target.closest('[data-act]');if(!b)return;
+ const a=b.dataset.act,id=b.dataset.id,c=S.clients.find(x=>x.id===id);
+ if(a==='open')openQ(id);
+ else if(a==='pdf')pdf(S.quotes.find(x=>x.id===id));
+ else if(a==='delq')arm(b,()=>delQ(id));
+ else if(a==='del')arm(b,()=>{delQ(q.id);go('devis');});
+ else if(a==='newfor')openNew(c);
+ else if(a==='delc')arm(b,()=>{S.clients=S.clients.filter(x=>x.id!==id);save();listC();});
+ else if(a==='editc'){ce=id;$('#cn').value=c.n;$('#ct').value=c.t;$('#cm').value=c.m;$('#ca').value=c.a;$('#csave').textContent='Enregistrer';$('#ccancel').hidden=false;scrollTo(0,0);}
+});
+
+async function pdf(qt){
+ const J=window.jspdf&&window.jspdf.jsPDF;let D=null;
+ try{D=window.claude&&await window.claude.use('downloads');}catch(e){}
+ if(!J||!D){toast("Téléchargement indisponible ici. Ouvrez le devis et utilisez Imprimer, puis « Enregistrer au format PDF ».");return;}
+ const S2=s=>String(s).replace(/[\u202f\u00a0]/g,' ').replace(/œ/g,'oe').replace(/Œ/g,'Oe').replace(/[’‘]/g,"'").replace(/€/g,'EUR'),
+ m=n=>S2(eur(n)),d=new J({unit:'mm',format:'a4'}),M=16,R=194,T=tot(qt),c=qt.client||{};let y=22;
+ const t=(s,x,yy,o)=>d.text(S2(s),x,yy,o),ft=(w,sz,col)=>{d.setFont('helvetica',w);d.setFontSize(sz);d.setTextColor(...col);},
+ blk=(arr,x,yy)=>{arr.forEach(s=>{if(s){d.text(d.splitTextToSize(S2(s),95),x,yy);yy+=5;}});return yy;},
+ ct=(tel,mail)=>[tel&&'Tél. '+tel,mail].filter(Boolean).join('  -  ');
+ ft('bold',17,[31,63,107]);t(qt.co||'Entreprise',M,y);
+ ft('normal',9,[90,102,115]);const yy=blk([qt.adr,ct(qt.tel,qt.mail),qt.si&&'SIRET '+qt.si],M,y+6);
+ ft('bold',20,[23,32,43]);t('DEVIS',R,y,{align:'right'});
+ ft('normal',9,[90,102,115]);t('N° '+qt.num,R,y+6,{align:'right'});t('Date : '+qt.date,R,y+11,{align:'right'});t('Valable '+qt.valid+' jours',R,y+16,{align:'right'});
+ y=Math.max(yy+4,50);t('Client',M,y);ft('bold',12,[23,32,43]);t(c.n||'-',M,y+6);
+ ft('normal',9,[90,102,115]);y=Math.max(blk([c.adr,ct(c.tel,c.mail)],M,y+11)+6,78);
+ const head=()=>{d.setFillColor(31,63,107);d.rect(M,y-5,R-M,8,'F');ft('bold',9,[255,255,255]);
+  t('Désignation',M+2,y);t('Qté',112,y,{align:'right'});t('P.U. HT',142,y,{align:'right'});t('TVA',160,y,{align:'right'});t('Total HT',R-2,y,{align:'right'});
+  y+=9;ft('normal',9,[23,32,43]);};
+ head();
+ qt.lines.forEach(l=>{
+  const w=d.splitTextToSize(S2(l.d||'-'),84),h=w.length*4.6+3;
+  if(y+h>262){d.addPage();y=22;head();}
+  d.text(w,M+2,y);t(fr(l.q)+' '+l.u,112,y,{align:'right'});t(m(l.p),142,y,{align:'right'});t(fr(l.t)+' %',160,y,{align:'right'});t(m(r2(l.q*l.p)),R-2,y,{align:'right'});
+  d.setDrawColor(211,217,223);d.line(M,y+h-4,R,y+h-4);y+=h;});
+ if(y>225){d.addPage();y=22;}
+ y+=4;
+ const row=(a,b,bold)=>{ft(bold?'bold':'normal',bold?11:10,[23,32,43]);t(a,140,y);t(b,R-2,y,{align:'right'});y+=bold?7:6;};
+ row('Total HT',m(T.ht));Object.keys(T.by).sort((a,b)=>b-a).forEach(r=>row('TVA '+fr(r)+' %',m(T.by[r])));row('Total TTC',m(T.ttc),1);
+ y+=6;ft('normal',9,[90,102,115]);
+ const nt=d.splitTextToSize(S2((qt.note||'')+(T.tv===0&&T.ht>0?'\nTVA non applicable, art. 293 B du CGI.':'')),R-M);
+ if(y+nt.length*4+30>285){d.addPage();y=22;}
+ d.text(nt,M,y);y+=nt.length*4+8;
+ d.setDrawColor(150,150,150);d.rect(110,y,84,24);ft('normal',9,[23,32,43]);t('Bon pour accord, date et signature',113,y+5);
+ try{await D.save({filename:('Devis-'+qt.num+'.pdf').replace(/[^\w.\-]/g,'_'),data:d.output('blob')});toast('Le PDF est prêt.');}
+ catch(e){toast(e&&e.code==='declined'?'Téléchargement annulé.':"Le téléchargement a échoué. Utilisez Imprimer.");}
+}
+go('devis');
+</script>
+</body>
+</html>
