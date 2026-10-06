@@ -1,7 +1,7 @@
 import './globals.css';
 import type { ReactNode } from 'react';
 
-export const metadata = { title: 'DevisPro AI', description: 'Devis professionnels pour artisans' };
+export const metadata = { title: 'DevisPro AI', description: 'Devis professionnels pour artisans', verification: { google: 'M1fddtpw6WnJmzs24dfnrzPCiSPklCKQqgBC7Qz0piU' } };
 export const viewport = { themeColor: '#1f3f6b', width: 'device-width', initialScale: 1, viewportFit: 'cover' };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
