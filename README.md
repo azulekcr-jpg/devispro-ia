@@ -18,6 +18,12 @@ Next.js (TypeScript) + Supabase (comptes et base Postgres). Paiements : pas enco
 4. Supabase > Authentication > URL Configuration : ajoutez `http://localhost:3000/auth/callback` aux URL de redirection.
 5. `npm run dev` puis http://localhost:3000.
 
+## Reproductibilité des installations
+Lancez une fois `npm install` sur votre ordinateur et **enregistrez le fichier `package-lock.json`** généré dans GitHub : Vercel installera alors exactement les mêmes versions à chaque déploiement.
+
+## Diagnostic en production
+Ouvrez `/sante` sur le site : configuration Supabase, migrations, Resend. Voir `docs/DEPANNAGE.md`.
+
 ## Vérifications
 - `npm test` : tests de la logique de devis, de la validation, de la couche de données (base simulée) et du PDF.
 - `npm run typecheck` et `npm run build`.
