@@ -1,16 +1,18 @@
 // Faux client Supabase en mémoire (sous-ensemble utilisé par src/lib/data.ts) pour tester la couche de données.
 type Row = Record<string, any>;
-export type Store = { companies: Row[]; clients: Row[]; quotes: Row[]; quote_lines: Row[]; counters: Record<string, number>; seq: number };
-export const newStore = (): Store => ({ companies: [], clients: [], quotes: [], quote_lines: [], counters: {}, seq: 0 });
+export type Store = { companies: Row[]; clients: Row[]; quotes: Row[]; quote_lines: Row[]; quote_emails?: Row[]; counters: Record<string, number>; seq: number };
+export const newStore = (): Store => ({ companies: [], clients: [], quotes: [], quote_lines: [], quote_emails: [], counters: {}, seq: 0 });
 
 class Q {
-  f: ((r: Row) => boolean)[] = []; op = 'select'; payload: any; ord: [string, boolean] | null = null; one = ''; cols = '*'; ret = false;
+  f: ((r: Row) => boolean)[] = []; op = 'select'; payload: any; ord: [string, boolean] | null = null; one = ''; cols = '*'; ret = false; max = 0;
   s: Store; t: keyof Store;
   constructor(s: Store, t: keyof Store) { this.s = s; this.t = t; }
   select(cols = '*') { this.cols = cols; if (this.op !== 'select') this.ret = true; return this; }
   insert(p: any) { this.op = 'insert'; this.payload = p; return this; }
   update(p: any) { this.op = 'update'; this.payload = p; return this; }
   delete() { this.op = 'delete'; return this; }
+  gte(k: string, v: any) { this.f.push((r) => r[k] >= v); return this; }
+  limit(n: number) { this.max = n; return this; }
   eq(k: string, v: any) { this.f.push((r) => r[k] === v); return this; }
   in(k: string, vs: any[]) { this.f.push((r) => vs.includes(r[k])); return this; }
   order(k: string, o?: { ascending?: boolean }) { this.ord = [k, o?.ascending !== false]; return this; }
@@ -25,9 +27,10 @@ class Q {
     return { data: data[0], error: null };
   }
   run(): any {
+    if (!this.s[this.t]) return { data: null, error: { message: `relation "${String(this.t)}" does not exist` } }; // table absente
     const all = this.rows(), hit = (r: Row) => this.f.every((p) => p(r));
     if (this.op === 'insert') {
-      const added = (Array.isArray(this.payload) ? this.payload : [this.payload]).map((p) => ({ id: `${this.t}-${++this.s.seq}`, created_at: this.s.seq, ...JSON.parse(JSON.stringify(p)) }));
+      const added = (Array.isArray(this.payload) ? this.payload : [this.payload]).map((p) => ({ id: `${this.t}-${++this.s.seq}`, created_at: new Date(Date.now() + this.s.seq).toISOString(), ...JSON.parse(JSON.stringify(p)) }));
       all.push(...added);
       return this.ret ? this.out(added) : { data: null, error: null };
     }
@@ -45,6 +48,7 @@ class Q {
     let data = all.filter(hit).map((r) => ({ ...r }));
     if (this.ord) { const [k, asc] = this.ord; data.sort((a, b) => (a[k] > b[k] ? 1 : a[k] < b[k] ? -1 : 0) * (asc ? 1 : -1)); }
     if (this.t === 'quotes' && this.cols.includes('quote_lines')) data = data.map((q) => ({ ...q, quote_lines: this.s.quote_lines.filter((l) => l.quote_id === q.id).map((l) => ({ ...l })) }));
+    if (this.max) data = data.slice(0, this.max);
     return this.out(JSON.parse(JSON.stringify(data)));
   }
 }

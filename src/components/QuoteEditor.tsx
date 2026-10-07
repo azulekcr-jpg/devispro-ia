@@ -9,7 +9,7 @@ import {
   addDaysIso, blankLine, fmtDate, formatEur, fromEditLine, lineHt, normalize, parseDescription, toCents, toEditLine, toNumber, totals,
   TVA_FRANCHISE_MENTION, VAT_RATES, type EditLine,
 } from '@/lib/quotes';
-import { validateClient, validateQuoteForm } from '@/lib/validation';
+import { isEmail, validateClient, validateQuoteForm } from '@/lib/validation';
 import { downloadFile, safeFilename } from '@/lib/browser';
 import { STATUSES, STATUS_LABELS, type Client, type Company, type Quote, type QuoteStatus } from '@/lib/types';
 import { useToast } from './Toast';
@@ -40,6 +40,8 @@ export default function QuoteEditor({ id }: { id?: string }) {
   const [loadErr, setLoadErr] = useState('');
   const [saving, setSaving] = useState(false);
   const [dirty, setDirty] = useState(false);
+  const [mail, setMail] = useState({ open: false, message: '', sending: false });
+  const [mailResult, setMailResult] = useState<{ ok: boolean; text: string } | null>(null);
   useUnsavedWarning(dirty);
 
   useEffect(() => {
@@ -128,18 +130,19 @@ export default function QuoteEditor({ id }: { id?: string }) {
     } catch (x) { toast(errMsg(x)); }
   }
 
-  async function save() {
+  async function save(): Promise<boolean> {
     const quote = current();
     const errs = validateQuoteForm({ client: quote.client, issuedOn: quote.issuedOn, validDays: quote.validDays, discount, lines });
     setErrors(errs);
-    if (errs.length) { toast('Corrigez les erreurs avant d’enregistrer.'); window.scrollTo(0, 0); return; }
+    if (errs.length) { toast('Corrigez les erreurs avant d’enregistrer.'); window.scrollTo(0, 0); return false; }
     setSaving(true);
     try {
       const r = await saveQuote(db, company!.id, quote);
       setDirty(false);
       if (!quote.id) router.replace(`/devis/${r.id}?enregistre=1`);
       else { setQ({ ...q!, number: r.number }); toast('Devis enregistré.'); }
-    } catch (x) { toast(errMsg(x)); } finally { setSaving(false); }
+      return true;
+    } catch (x) { toast(errMsg(x)); return false; } finally { setSaving(false); }
   }
   async function pdf() {
     try {
@@ -150,6 +153,27 @@ export default function QuoteEditor({ id }: { id?: string }) {
   }
   async function remove() {
     try { await deleteQuote(db, q!.id); setDirty(false); router.push('/devis'); } catch (x) { toast(errMsg(x)); }
+  }
+
+  const clientMail = q.client.email.trim();
+  const mailProblem = !q.id ? 'Enregistrez d’abord le devis, puis envoyez-le.' : !clientMail ? 'Renseignez l’adresse e-mail du client dans le devis.' : !isEmail(clientMail) ? 'L’adresse e-mail du client est invalide.' : '';
+  async function sendEmail() {
+    setMail((m) => ({ ...m, sending: true }));
+    setMailResult(null);
+    try {
+      if (dirty && !(await save())) { setMailResult({ ok: false, text: 'Le devis doit être enregistré avant l’envoi : corrigez les erreurs signalées puis réessayez.' }); return; }
+      const res = await fetch('/api/devis/envoyer', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ quoteId: q!.id, message: mail.message }) });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.ok) {
+        setMailResult({ ok: true, text: `✓ Devis envoyé à ${data.to}, avec le PDF en pièce jointe.` });
+        toast('Devis envoyé par e-mail.');
+        if (q!.status === 'brouillon') setQ((p) => (p ? { ...p, status: 'envoye' } : p));
+      } else setMailResult({ ok: false, text: data.message || `Envoi impossible (erreur ${res.status}).` });
+    } catch {
+      setMailResult({ ok: false, text: 'Impossible de joindre le serveur. Vérifiez votre connexion et réessayez.' });
+    } finally {
+      setMail((m) => ({ ...m, sending: false }));
+    }
   }
 
   const visibleClients = clients.filter((c) => c.id === q.clientId || !clientSearch.trim() || normalize(`${c.name} ${c.phone} ${c.email}`).includes(normalize(clientSearch.trim())));
@@ -208,9 +232,32 @@ export default function QuoteEditor({ id }: { id?: string }) {
         <button className="btn pri" type="button" onClick={save} disabled={saving}>{saving ? 'Enregistrement…' : 'Enregistrer'}</button>
         <button className="btn" type="button" onClick={pdf}>Télécharger le PDF</button>
         <button className="btn" type="button" onClick={() => window.print()}>Imprimer</button>
+        <button className="btn" type="button" onClick={() => { setMail((m) => ({ ...m, open: !m.open })); setMailResult(null); }}>Envoyer par e-mail</button>
         {q.id && <button className="btn" type="button" onClick={refreshCompany}>Actualiser mes informations</button>}
         {q.id && <ConfirmButton label="Supprimer" className="btn dng" onConfirm={remove} />}
       </div>
+
+      {mail.open && (
+        <div className="card noprint" id="email-panel">
+          <h2 style={{ fontSize: 18, margin: '0 0 12px' }}>Envoyer le devis par e-mail</h2>
+          <p style={{ margin: '0 0 10px' }}>
+            Destinataire : <b>{clientMail || 'non renseigné'}</b><br />
+            <span className="sm">
+              Le PDF du devis est joint automatiquement.
+              {company.email.trim() && isEmail(company.email) ? ` Le client pourra répondre directement à ${company.email.trim()}.` : ' Renseignez l’e-mail de « Mon entreprise » pour que le client puisse vous répondre directement.'}
+            </span>
+          </p>
+          <label className="f"><span>Message (facultatif)</span>
+            <textarea rows={3} value={mail.message} onChange={(e) => setMail({ ...mail, message: e.target.value })} />
+          </label>
+          {mailProblem && <p className="fe" role="alert">{mailProblem}</p>}
+          <div className="bt">
+            <button className="btn pri" type="button" onClick={sendEmail} disabled={!!mailProblem || mail.sending}>{mail.sending ? 'Envoi en cours…' : 'Envoyer le devis'}</button>
+            <button className="btn" type="button" onClick={() => setMail({ ...mail, open: false })}>Fermer</button>
+          </div>
+          {mailResult && <p className={mailResult.ok ? 'ok' : 'errs'} role={mailResult.ok ? 'status' : 'alert'} style={{ marginTop: 12 }}>{mailResult.text}</p>}
+        </div>
+      )}
 
       <div className="paper" id="paper">
         <div className="ph">

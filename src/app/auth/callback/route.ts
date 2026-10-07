@@ -9,6 +9,7 @@ export async function GET(request: Request) {
     const supabase = await supabaseServer();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) return NextResponse.redirect(`${origin}/devis`);
+    console.error('Callback : échange du code impossible', error.message);
   }
-  return NextResponse.redirect(`${origin}/connexion`);
+  return NextResponse.redirect(`${origin}/connexion?erreur=lien`);
 }

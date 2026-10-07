@@ -7,14 +7,14 @@ Next.js (TypeScript) + Supabase (comptes et base Postgres). Paiements : pas enco
 - **Mon entreprise** : nom, forme juridique, adresse, téléphone, e-mail, SIRET, TVA intracommunautaire, RCS/métiers, assurance, logo, franchise de TVA, taux de TVA par défaut, validité et conditions par défaut, export des données.
 - **Mes clients** : ajouter, modifier, supprimer, rechercher (sans tenir compte des accents), créer un devis pour un client.
 - **Mes devis** : liste, recherche, filtre par statut, ouvrir, PDF, supprimer (en deux appuis).
-- **Éditeur de devis** : client (choix d'un client enregistré ou saisie), génération des lignes à partir d'une description, lignes (désignation, quantité, unité, prix HT, TVA), remise globale, totaux HT / TVA par taux / TTC, numérotation automatique (DEV-2026-001), statut (brouillon, envoyé, accepté, refusé), PDF, impression.
+- **Éditeur de devis** : client (choix d'un client enregistré ou saisie), génération des lignes à partir d'une description, lignes (désignation, quantité, unité, prix HT, TVA), remise globale, totaux HT / TVA par taux / TTC, numérotation automatique (DEV-2026-001), statut (brouillon, envoyé, accepté, refusé), PDF, impression, **envoi du devis par e-mail avec le PDF en pièce jointe** (Resend, voir `docs/EMAILS.md`).
 - **TVA** : calculée sur le total HT de chaque taux (pas ligne par ligne). Une remise réduit la base de chaque taux avant le calcul.
 - Interface adaptée au téléphone, installable (manifeste et icônes fournis).
 
 ## Lancer en local
 1. Node 22 ou plus, puis `npm install`.
 2. Créez un projet Supabase (région UE). Copiez `.env.example` en `.env.local` et renseignez l'URL et la clé publique ("anon" / "publishable").
-3. Dans Supabase (SQL Editor), exécutez dans l'ordre `supabase/migrations/0001_init.sql` puis `0002_entreprise_et_devis.sql`.
+3. Dans Supabase (SQL Editor), exécutez dans l'ordre `supabase/migrations/0001_init.sql`, `0002_entreprise_et_devis.sql` puis `0003_envoi_devis_email.sql`.
 4. Supabase > Authentication > URL Configuration : ajoutez `http://localhost:3000/auth/callback` aux URL de redirection.
 5. `npm run dev` puis http://localhost:3000.
 

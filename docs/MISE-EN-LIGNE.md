@@ -3,12 +3,13 @@
 ## 1. Base de données et comptes (Supabase)
 - [ ] Projet en région UE ; migrations `0001` et `0002` exécutées dans l'ordre.
 - [ ] Authentication > URL Configuration : URL du site et `https://VOTRE-SITE/auth/callback` en redirection.
-- [ ] **E-mails de connexion** : le service d'envoi par défaut est limité et prévu pour les tests. Configurez un SMTP dédié (Resend, Brevo, Mailjet…) et traduisez les modèles d'e-mail en français.
+- [ ] **E-mails de connexion** (voir `docs/EMAILS.md`) : le service d'envoi par défaut est limité et prévu pour les tests. Configurez un SMTP dédié (Resend, Brevo, Mailjet…) et traduisez les modèles d'e-mail en français.
 - [ ] Sauvegardes automatiques activées (offre Pro) ; faites un test de restauration.
 
 ## 2. Hébergement
 - [ ] GitHub puis Vercel (offre Pro pour un usage commercial) ou un hébergeur Docker (`Dockerfile` fourni).
-- [ ] Variables : `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`. Aucune clé secrète n'est nécessaire à ce stade.
+- [ ] Variables publiques : `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+- [ ] Variables secrètes (serveur) pour l'envoi des devis : `RESEND_API_KEY`, `EMAIL_FROM` (voir `docs/EMAILS.md`). Jamais dans GitHub.
 - [ ] Nom de domaine, HTTPS, redirection www.
 
 ## 3. Juridique (à faire valider par un professionnel)
