@@ -1,6 +1,6 @@
-// Repère dans le journal de build Vercel : version du code compilée et présence des variables (sans afficher leur valeur).
-const etat = (n) => (process.env[n] && process.env[n].trim() ? `présente (${process.env[n].trim().length} caractères)` : 'ABSENTE');
-console.log(`[DevisPro] code lazy-client-v3 | NEXT_PUBLIC_SUPABASE_URL ${etat('NEXT_PUBLIC_SUPABASE_URL')} | NEXT_PUBLIC_SUPABASE_ANON_KEY ${etat('NEXT_PUBLIC_SUPABASE_ANON_KEY')} | RESEND_API_KEY ${etat('RESEND_API_KEY')} | EMAIL_FROM ${etat('EMAIL_FROM')}`);
+// Journal de build : quelles variables le build voit-il ? (aucune valeur n'est affichée)
+const vue = (n) => (process.env[n] && process.env[n].trim() ? 'présente' : 'ABSENTE');
+console.log(`[DevisPro] variables vues par le build : NEXT_PUBLIC_SUPABASE_URL ${vue('NEXT_PUBLIC_SUPABASE_URL')} | NEXT_PUBLIC_SUPABASE_ANON_KEY ${vue('NEXT_PUBLIC_SUPABASE_ANON_KEY')} | RESEND_API_KEY ${vue('RESEND_API_KEY')} | EMAIL_FROM ${vue('EMAIL_FROM')}`);
 
 /** @type {import('next').NextConfig} */
 const nextConfig = { output: 'standalone' };

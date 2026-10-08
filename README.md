@@ -19,10 +19,10 @@ Next.js (TypeScript) + Supabase (comptes et base Postgres). Paiements : pas enco
 5. `npm run dev` puis http://localhost:3000.
 
 ## Reproductibilité des installations
-Lancez une fois `npm install` sur votre ordinateur et **enregistrez le fichier `package-lock.json`** généré dans GitHub : Vercel installera alors exactement les mêmes versions à chaque déploiement.
+Lancez une fois `npm install` sur votre ordinateur et **enregistrez le fichier `package-lock.json`** généré dans GitHub (ou lancez le workflow « Générer package-lock.json » dans l'onglet Actions) : Vercel installera alors exactement les mêmes versions à chaque déploiement.
 
-## Diagnostic en production
-Ouvrez `/sante` sur le site : configuration Supabase, migrations, Resend. Voir `docs/DEPANNAGE.md`.
+## Dépannage
+Build Vercel, variables d'environnement, versions : `docs/DEPANNAGE.md`.
 
 ## Vérifications
 - `npm test` : tests de la logique de devis, de la validation, de la couche de données (base simulée) et du PDF.
